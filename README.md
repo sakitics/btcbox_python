@@ -5,7 +5,7 @@
 ### HTTP API
 
 BTCBOX APIには、大きく2つのAPIが存在します。  
-認証が不要なHTTP Public APIと、APIキーによる認証が必要なHTTP Private APIです。  
+認証が不要な[HTTP Public API](doc/public.md)と、APIキーによる認証が必要なHTTP Private APIです。  
 
 エンドポイントURL: https://www.btcbox.co.jp/api/v1
 
