@@ -1,2 +1,4 @@
-requests
 configparser
+numpy
+pandas
+requests
