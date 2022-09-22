@@ -127,3 +127,7 @@ print((data, status_code))
     }
 }
 ```
+
+#### Errors
+
+[Error Code](error_code.md)を参照してください。

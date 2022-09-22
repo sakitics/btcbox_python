@@ -1,0 +1,1165 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <title>Orders（取扱銘柄の約定履歴を取得） · HonKit</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="HonKit 4.0.0">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/@honkit/honkit-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="error_code.html" />
+    
+    
+    <link rel="prev" href="orderbook.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book honkit-cloak">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Overview
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="public.html">
+            
+                <a href="public.html">
+            
+                    
+                    HTTP Public API
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="ticker.html">
+            
+                <a href="ticker.html">
+            
+                    
+                    Ticker（取扱銘柄のリアルタイムレートを取得）
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="tickers.html">
+            
+                <a href="tickers.html">
+            
+                    
+                    Tickers（全取扱銘柄のリアルタイムレートを取得）
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.3" data-path="orderbook.html">
+            
+                <a href="orderbook.html">
+            
+                    
+                    Orderbook（取扱銘柄の板情報を取得）
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.2.4" data-path="orders.html">
+            
+                <a href="orders.html">
+            
+                    
+                    Orders（取扱銘柄の約定履歴を取得）
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="error_code.html">
+            
+                <a href="error_code.html">
+            
+                    
+                    Error Code
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="disclaimer.html">
+            
+                <a href="disclaimer.html">
+            
+                    
+                    免責事項
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://github.com/honkit/honkit" target="blank" class="gitbook-link">
+            Published with HonKit
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >Orders（取扱銘柄の約定履歴を取得）</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h3 id="orders（取扱銘柄の約定履歴を取得）">Orders（取扱銘柄の約定履歴を取得）</h3>
+<p>最新100件分の指定した暗号資産の約定履歴を取得します。</p>
+<h4 id="request">Request</h4>
+<p>```http request
+GET /orders</p>
+<pre><code>
+#### Request parameters
+
+| Name | Type | Required | Description                                       |
+|------|------|----------|---------------------------------------------------|
+| coin | str  | no       | 取扱銘柄：btc、bch、ltc、eth、doge、dot、trxのいずれか（デフォルトはbtc） |
+
+#### Request example
+
+```python
+import json
+import traceback
+import urllib.parse
+
+import requests
+
+
+endpoint: str = &quot;https://www.btcbox.co.jp/api/v1&quot;
+path: str = &quot;/orders&quot;
+url: str = &quot;&quot;.join([
+    endpoint,
+    path,
+    &quot;?&quot;,
+    urllib.parse.urlencode(dict(
+        coin=&quot;doge&quot;,
+    ))
+])
+timeout: float = 3.0
+status_code: int = 200
+
+res: requests.models.Response = None
+try:
+    res = requests.get(url, timeout=timeout)
+    res.raise_for_status()
+except requests.exceptions.Timeout:
+    data = {
+        &quot;error&quot;: &quot;Request timeout&quot;,
+        &quot;response&quot;: str(res),
+        &quot;url&quot;: url,
+    }
+    status_code = 408
+except requests.exceptions.RequestException as exception:
+    data = {
+        &quot;error&quot;: traceback.format_exception_only(type(exception), exception)[0],
+        &quot;response&quot;: str(res),
+        &quot;url&quot;: url,
+    }
+    status_code = 500
+else:
+    data = json.loads(res.text)
+
+print((data, status_code))
+</code></pre><h4 id="response">Response</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>date</td>
+<td>str</td>
+<td>約定日時（UNIX時間）</td>
+</tr>
+<tr>
+<td>price</td>
+<td>float</td>
+<td>約定価格</td>
+</tr>
+<tr>
+<td>amount</td>
+<td>float</td>
+<td>約定数量</td>
+</tr>
+<tr>
+<td>tid</td>
+<td>float</td>
+<td>注文ID</td>
+</tr>
+<tr>
+<td>type</td>
+<td>float</td>
+<td>売買区分（sellまたはbuy）</td>
+</tr>
+</tbody>
+</table>
+<h4 id="response-example">Response example</h4>
+<pre><code class="lang-json">[
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856323&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.33</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.6477</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753538&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856329&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.33</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.5273</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753539&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856335&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.33</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.6441</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753540&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856341&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.33</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.5972</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753541&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856348&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.33</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.1531</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753542&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856355&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.3804</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753543&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856361&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.9606</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753544&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856368&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.5723</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753545&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856374&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.1024</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753546&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856380&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.3842</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753547&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856386&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.9358</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753548&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856392&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.6868</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753549&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856398&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.5849</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753550&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856405&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.6832</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753551&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856411&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.8054</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753552&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856417&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.999</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753553&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856423&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.6325</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753554&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856429&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.1916</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753555&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856435&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.3182</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753556&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856441&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.4486</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753557&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856447&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.5325</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753558&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856456&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.33</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.5281</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753559&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;buy&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856463&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.33</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.6541</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753560&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856470&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.33</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.2941</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753561&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856477&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.33</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.1413</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753562&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856483&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.33</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.5978</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753563&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856489&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.33</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.0225</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753564&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856494&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.33</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.6</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753565&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856501&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.33</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.262</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753566&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856507&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.33</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.8431</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753567&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856515&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.0066</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753568&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856521&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.2652</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753569&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856527&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.3343</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753570&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856533&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.2272</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753571&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856542&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.33</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.8532</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753572&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;buy&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856548&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.33</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.3385</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753573&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856555&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.2557</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753574&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856563&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.4092</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753575&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856569&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.2137</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753576&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856574&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.5736</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753577&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856581&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.4361</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753578&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856587&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.9847</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753579&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856593&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.7223</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753580&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856599&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.3637</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753581&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856607&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.9307</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753582&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856613&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.3624</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753583&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856618&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.2395</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753584&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856626&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.31</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.0106</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753585&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856633&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.31</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.3614</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753586&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856640&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.2689</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753587&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856646&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.5121</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753588&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856652&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.4322</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753589&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856659&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.6676</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753590&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856665&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.4101</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753591&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856671&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.5954</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753592&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856677&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.8247</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753593&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856683&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.5761</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753594&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856689&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.2123</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753595&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856695&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.5771</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753596&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856701&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.2686</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753597&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856708&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.7959</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753598&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856714&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.2653</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753599&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856720&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.2354</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753600&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856726&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.2666</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753601&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856732&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.2925</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753602&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856739&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.9504</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753603&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856745&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.4983</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753604&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856750&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.0745</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753605&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856757&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.5058</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753606&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856765&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.31</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.7883</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753607&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856773&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.9253</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753608&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;buy&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856780&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.8935</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753609&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856786&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.2541</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753610&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856794&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.33</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.6313</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753611&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;buy&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856802&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.4453</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753612&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856808&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.9046</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753613&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856814&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.0167</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753614&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856820&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.3458</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753615&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856827&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.6767</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753616&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856833&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.2159</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753617&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856841&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.33</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.2118</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753618&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856847&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.33</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.1988</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753619&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856854&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.33</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.4639</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753620&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856861&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.5134</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753621&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856869&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.2336</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753622&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856874&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.5295</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753623&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856882&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.32</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.6091</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753624&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856890&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.34</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.869</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753625&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;buy&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856897&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.35</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.7409</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753626&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856904&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.35</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.3261</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753627&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856910&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.35</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.3885</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753628&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856916&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.35</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.1936</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753629&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856922&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.35</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.897</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753630&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856928&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.35</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.6533</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753631&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856934&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.35</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">2.4414</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753632&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856940&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.35</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.4731</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753633&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856948&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.35</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.0032</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753634&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856954&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.36</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.8089</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753635&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856961&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.36</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">1.9044</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753636&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;date&quot;</span>: <span class="hljs-string">&quot;1663856968&quot;</span>,
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">8.36</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">0.5453</span>,
+        <span class="hljs-string">&quot;tid&quot;</span>: <span class="hljs-string">&quot;1753637&quot;</span>,
+        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>
+    }
+]
+</code></pre>
+<h4 id="errors">Errors</h4>
+<p><a href="error_code.html">Error Code</a>を参照してください。</p>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="orderbook.html" class="navigation navigation-prev " aria-label="Previous page: Orderbook（取扱銘柄の板情報を取得）">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="error_code.html" class="navigation navigation-next " aria-label="Next page: Error Code">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Orders（取扱銘柄の約定履歴を取得）","level":"1.2.4","depth":2,"next":{"title":"Error Code","level":"1.3","depth":1,"path":"doc/error_code.md","ref":"doc/error_code.md","articles":[]},"previous":{"title":"Orderbook（取扱銘柄の板情報を取得）","level":"1.2.3","depth":2,"path":"doc/orderbook.md","ref":"doc/orderbook.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"doc/orders.md","mtime":"2022-09-22T14:30:55.321Z","type":"markdown"},"gitbook":{"version":"4.0.0","time":"2022-09-22T14:40:56.331Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <noscript>
+        <style>
+            .honkit-cloak {
+                display: block !important;
+            }
+        </style>
+    </noscript>
+    <script>
+        // Restore sidebar state as critical path for prevent layout shift
+        function __init__getSidebarState(defaultValue){
+            var baseKey = "";
+            var key = baseKey + ":sidebar";
+            try {
+                var value = localStorage[key];
+                if (value === undefined) {
+                    return defaultValue;
+                }
+                var parsed = JSON.parse(value);
+                return parsed == null ? defaultValue : parsed;
+            } catch (e) {
+                return defaultValue;
+            }
+        }
+        function __init__restoreLastSidebarState() {
+            var isMobile = window.matchMedia("(max-width: 600px)").matches;
+            if (isMobile) {
+                // Init last state if not mobile
+                return;
+            }
+            var sidebarState = __init__getSidebarState(true);
+            var book = document.querySelector(".book");
+            // Show sidebar if it enabled
+            if (sidebarState && book) {
+                book.classList.add("without-animation", "with-summary");
+            }
+        }
+
+        try {
+            __init__restoreLastSidebarState();
+        } finally {
+            var book = document.querySelector(".book");
+            book.classList.remove("honkit-cloak");
+        }
+    </script>
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+
