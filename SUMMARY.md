@@ -1,4 +1,4 @@
-# API Documentation
+![BTCBOX API DOCUMENTATION](doc/img/summary01.png)
 
 * [Overview](README.md)
 * [HTTP Public API](doc/public.md)
