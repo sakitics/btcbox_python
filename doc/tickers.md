@@ -34,21 +34,21 @@ try:
     res = requests.get(url, timeout=timeout)
     res.raise_for_status()
 except requests.exceptions.Timeout:
-    data = {
+    data: dict = {
         "error": "Request timeout",
         "response": str(res),
         "url": url,
     }
     status_code = 408
 except requests.exceptions.RequestException as exception:
-    data = {
+    data: dict = {
         "error": traceback.format_exception_only(type(exception), exception)[0],
         "response": str(res),
         "url": url,
     }
     status_code = 500
 else:
-    data = json.loads(res.text)
+    data: dict = json.loads(res.text)
 
 print((data, status_code))
 ```
