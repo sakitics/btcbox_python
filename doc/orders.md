@@ -39,7 +39,7 @@ status_code: int = 200
 
 res: requests.models.Response = None
 try:
-    res = requests.get(url, timeout=timeout)
+    res = requests.get(url=url, timeout=timeout)
     res.raise_for_status()
 except requests.exceptions.Timeout:
     data: dict = {

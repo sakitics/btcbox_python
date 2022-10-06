@@ -6,5 +6,7 @@
   * [Tickers（全取扱銘柄のリアルタイムレートを取得）](doc/tickers.md)
   * [Orderbook（取扱銘柄の板情報を取得）](doc/orderbook.md)
   * [Orders（取扱銘柄の約定履歴を取得）](doc/orders.md)
+* [HTTP Private API](doc/private.md)
+  * [Balance（残高の取得）](doc/balance.md)
 * [Error Code](doc/error_code.md)
 * [免責事項](doc/disclaimer.md)
