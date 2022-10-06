@@ -170,7 +170,39 @@
             
         </li>
     
-        <li class="chapter " data-level="1.3" data-path="doc/error_code.html">
+        <li class="chapter " data-level="1.3" data-path="doc/private.html">
+            
+                <a href="doc/private.html">
+            
+                    
+                    HTTP Private API
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="doc/balance.html">
+            
+                <a href="doc/balance.html">
+            
+                    
+                    Balance（残高の取得）
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="doc/error_code.html">
             
                 <a href="doc/error_code.html">
             
@@ -183,7 +215,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4" data-path="doc/disclaimer.html">
+        <li class="chapter " data-level="1.5" data-path="doc/disclaimer.html">
             
                 <a href="doc/disclaimer.html">
             
@@ -241,10 +273,11 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h2 id="overview">Overview</h2>
+                                <p><img src="doc/img/readme01.png" alt="BTCBOX API DOCUMENTATION"></p>
+<h2 id="overview">Overview</h2>
 <p>はじめに<a href="doc/disclaimer.html">免責事項</a>をお読みください。</p>
 <h3 id="http-api">HTTP API</h3>
-<p>BTCBOX APIには、大きく2つのAPIが存在します。<br>認証が不要な<a href="doc/public.html">HTTP Public API</a>と、APIキーによる認証が必要なHTTP Private APIです。  </p>
+<p>BTCBOX APIには、大きく2つのAPIが存在します。<br>認証が不要な<a href="doc/public.html">HTTP Public API</a>と、APIキーによる認証が必要な<a href="doc/private.html">HTTP Private API</a>です。  </p>
 <p>エンドポイントURL: <a href="https://www.btcbox.co.jp/api/v1" target="_blank">https://www.btcbox.co.jp/api/v1</a></p>
 <h3 id="rate-limiting">Rate limiting</h3>
 <p>以下のHTTP APIは、呼び出し回数に制限があります。<br>これら以外のHTTP APIには、呼び出し回数の制限はありません。ただし、システムに負荷がかかる呼び出しなどが行なわれた場合は、BTCBOX株式会社の判断でAPIの使用が制限される場合があります。  </p>
@@ -275,6 +308,18 @@
 </tbody>
 </table>
 <h3 id="authentication">Authentication</h3>
+<p>HTTP Private APIを利用するには認証が必要です。<br><a href="https://support.btcbox.co.jp/hc/ja/articles/360001889534-APIキー取得の手順" target="_blank">APIキーの取得</a>を参照して、APIの公開鍵と秘密鍵を取得します。  </p>
+<blockquote>
+<p>【注意】<br>秘密鍵が第三者に知られた場合、意図しない資産の操作・取引等が行われ、損害が発生する可能性があります。秘密鍵は、必ず安全な方法で管理する必要があります。  </p>
+</blockquote>
+<h4 id="signature">signature</h4>
+<ol>
+<li>signature以外のパラメータを利用して、次のような文字列を生成する。（例：coin, key, nonce→coin=btc&amp;key=&lt;公開鍵&gt;&amp;nonce=1234567890）</li>
+<li>生成した文字列をMD5アルゴリズムでダイジェストした秘密鍵でHMAC-SHA256署名を行います。</li>
+<li>signatureとその他のパラメータをHTTP APIへ送信します。</li>
+</ol>
+<h4 id="nonce">nonce</h4>
+<p>通常はUNIX時間で設定すれば問題ありません。<br>なお、BTCBOXのシステムは同一UIDについてnonceが前回リクエストされたnonceより大きいことをチェックします。マルチスレッドプログラミングを行なう場合は注意が必要です。  </p>
 <h3 id="pagination">Pagination</h3>
 <h3 id="install-request">Install request</h3>
 <p>以下のオペレーションで、サンプルコード（Python）を動作させるためのライブラリをインストールしてください。  </p>
@@ -323,7 +368,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Overview","level":"1.1","depth":1,"next":{"title":"HTTP Public API","level":"1.2","depth":1,"path":"doc/public.md","ref":"doc/public.md","articles":[{"title":"Ticker（取扱銘柄のリアルタイムレートを取得）","level":"1.2.1","depth":2,"path":"doc/ticker.md","ref":"doc/ticker.md","articles":[]},{"title":"Tickers（全取扱銘柄のリアルタイムレートを取得）","level":"1.2.2","depth":2,"path":"doc/tickers.md","ref":"doc/tickers.md","articles":[]},{"title":"Orderbook（取扱銘柄の板情報を取得）","level":"1.2.3","depth":2,"path":"doc/orderbook.md","ref":"doc/orderbook.md","articles":[]},{"title":"Orders（取扱銘柄の約定履歴を取得）","level":"1.2.4","depth":2,"path":"doc/orders.md","ref":"doc/orders.md","articles":[]}]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"README.md","mtime":"2022-09-18T15:28:07.157Z","type":"markdown"},"gitbook":{"version":"4.0.0","time":"2022-09-22T14:40:56.331Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Overview","level":"1.1","depth":1,"next":{"title":"HTTP Public API","level":"1.2","depth":1,"path":"doc/public.md","ref":"doc/public.md","articles":[{"title":"Ticker（取扱銘柄のリアルタイムレートを取得）","level":"1.2.1","depth":2,"path":"doc/ticker.md","ref":"doc/ticker.md","articles":[]},{"title":"Tickers（全取扱銘柄のリアルタイムレートを取得）","level":"1.2.2","depth":2,"path":"doc/tickers.md","ref":"doc/tickers.md","articles":[]},{"title":"Orderbook（取扱銘柄の板情報を取得）","level":"1.2.3","depth":2,"path":"doc/orderbook.md","ref":"doc/orderbook.md","articles":[]},{"title":"Orders（取扱銘柄の約定履歴を取得）","level":"1.2.4","depth":2,"path":"doc/orders.md","ref":"doc/orders.md","articles":[]}]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"README.md","mtime":"2022-10-06T13:41:42.032Z","type":"markdown"},"gitbook":{"version":"4.0.0","time":"2022-10-06T13:41:46.682Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>
