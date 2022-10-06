@@ -3,7 +3,7 @@
 <html lang="" >
     <head>
         <meta charset="UTF-8">
-        <title>Error Code · HonKit</title>
+        <title>Balance（残高の取得） · HonKit</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="HonKit 4.0.0">
@@ -56,10 +56,10 @@
     <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="disclaimer.html" />
+    <link rel="next" href="error_code.html" />
     
     
-    <link rel="prev" href="balance.html" />
+    <link rel="prev" href="private.html" />
     
 
     </head>
@@ -186,7 +186,7 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="1.3.1" data-path="balance.html">
+        <li class="chapter active" data-level="1.3.1" data-path="balance.html">
             
                 <a href="balance.html">
             
@@ -204,7 +204,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.4" data-path="error_code.html">
+        <li class="chapter " data-level="1.4" data-path="error_code.html">
             
                 <a href="error_code.html">
             
@@ -260,7 +260,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href=".." >Error Code</a>
+        <a href=".." >Balance（残高の取得）</a>
     </h1>
 </div>
 
@@ -275,106 +275,214 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="error-code">Error Code</h1>
+                                <h3 id="balance（残高の取得）">Balance（残高の取得）</h3>
+<p>保有している暗号資産と法定通貨の残高を取得できます。</p>
+<h4 id="request">Request</h4>
+<p>```http request
+GET /balance</p>
+<pre><code>
+#### Request parameters
+
+| Name      | Type | Required | Description                                       |
+|-----------|------|----------|---------------------------------------------------|
+| coin      | str  | no       | 取扱銘柄：btc、bch、ltc、eth、doge、dot、trxのいずれか（デフォルトはbtc） |
+| key       | str  | yes      | APIキー（公開鍵）                                        |
+| nonce     | str  | yes      | ノンス                                               |
+| signature | str  | yes      | 署名                                                |
+
+#### Request example
+
+```python
+import datetime
+import hashlib
+import hmac
+import json
+import traceback
+import urllib
+
+import configparser
+import requests
+
+
+endpoint: str = &quot;https://www.btcbox.co.jp/api/v1&quot;
+path: str = &quot;/balance&quot;
+url: str = &quot;&quot;.join([
+    endpoint,
+    path,
+])
+timeout: float = 3.0
+status_code: int = 200
+
+config = configparser.ConfigParser()
+config.read(&quot;config.ini&quot;)
+apikey_public = config.get(&quot;DEEP&quot;, &apos;key&apos;)
+apikey_secret = config.get(&quot;DEEP&quot;, &apos;sec&apos;)
+
+timestamp = datetime.datetime.now().timestamp()
+body = {
+    &quot;key&quot;: apikey_public,
+    &quot;nonce&quot;: timestamp,
+}
+
+secret_md5 = bytearray(hashlib.md5(apikey_secret.encode(&quot;utf-8&quot;)).hexdigest(), &quot;ascii&quot;)
+text = bytearray(urllib.parse.urlencode(body), &quot;ascii&quot;)
+sign = urllib.parse.quote(hmac.new(secret_md5, text, hashlib.sha256).hexdigest())
+body[&quot;signature&quot;] = sign
+
+res: requests.models.Response = None
+try:
+    res = requests.post(url=url, data=body, timeout=timeout)
+    res.raise_for_status()
+except requests.exceptions.Timeout:
+    data: dict = {
+        &quot;error&quot;: &quot;Request timeout&quot;,
+        &quot;response&quot;: str(res),
+        &quot;url&quot;: url,
+    }
+    status_code = 408
+except requests.exceptions.RequestException as exception:
+    data: dict = {
+        &quot;error&quot;: traceback.format_exception_only(type(exception), exception)[0],
+        &quot;response&quot;: str(res),
+        &quot;url&quot;: url,
+    }
+    status_code = 500
+else:
+    data: dict = json.loads(res.text)
+
+print((data, status_code))
+</code></pre><h4 id="response">Response</h4>
 <table>
 <thead>
 <tr>
-<th>Code</th>
+<th>Name</th>
+<th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>100</td>
-<td>必須パラメーターを空にすることはできません</td>
+<td>uid</td>
+<td>int</td>
+<td>ユーザーID</td>
 </tr>
 <tr>
-<td>101</td>
-<td>無効なパラメータです</td>
+<td>nameauth</td>
+<td>int</td>
+<td>本人認証の状態、0:未認証、1:認証済</td>
 </tr>
 <tr>
-<td>102</td>
-<td>コインが存在しません</td>
+<td>moflag</td>
+<td>int</td>
+<td>SMS認証設定の状態、0:未認証、1:認証済</td>
 </tr>
 <tr>
-<td>103</td>
-<td>キーが存在しません</td>
+<td>btc_balance</td>
+<td>float</td>
+<td>BTC残高</td>
 </tr>
 <tr>
-<td>104</td>
-<td>署名が一致しません</td>
+<td>btc_lock</td>
+<td>float</td>
+<td>注文中のBTC数量</td>
 </tr>
 <tr>
-<td>105</td>
-<td>権限がありません</td>
+<td>bch_balance</td>
+<td>float</td>
+<td>BCH残高</td>
 </tr>
 <tr>
-<td>106</td>
-<td>リクエストが期限切れになりました（nonce error）</td>
+<td>bch_lock</td>
+<td>float</td>
+<td>注文中のBCH数量</td>
 </tr>
 <tr>
-<td>107</td>
-<td>注文価格が0以下になっています</td>
+<td>ltc_balance</td>
+<td>float</td>
+<td>LTC残高</td>
 </tr>
 <tr>
-<td>200</td>
-<td>残高が不足しています</td>
+<td>ltc_lock</td>
+<td>float</td>
+<td>注文中のLTC数量</td>
 </tr>
 <tr>
-<td>201</td>
-<td>取引数が少なすぎます</td>
+<td>eth_balance</td>
+<td>float</td>
+<td>ETH残高</td>
 </tr>
 <tr>
-<td>202</td>
-<td>注文価格が市場価格上下20%の範囲を超えています</td>
+<td>eth_lock</td>
+<td>float</td>
+<td>注文中のETH数量</td>
 </tr>
 <tr>
-<td>203</td>
-<td>注文が存在しません</td>
+<td>doge_balance</td>
+<td>float</td>
+<td>DOGE残高</td>
 </tr>
 <tr>
-<td>301</td>
-<td>本人確認が完了していません</td>
+<td>doge_lock</td>
+<td>float</td>
+<td>注文中のDOGE数量</td>
 </tr>
 <tr>
-<td>302</td>
-<td>本人確認書類の有効期限が切れています</td>
+<td>dot_balance</td>
+<td>float</td>
+<td>DOT残高</td>
 </tr>
 <tr>
-<td>401</td>
-<td>システムエラー</td>
+<td>dot_lock</td>
+<td>float</td>
+<td>注文中のDOT数量</td>
 </tr>
 <tr>
-<td>402</td>
-<td>リクエスト回数が上限を上回っています</td>
+<td>trx_balance</td>
+<td>float</td>
+<td>TRX残高</td>
 </tr>
 <tr>
-<td>403</td>
-<td>非オープンAPIです</td>
+<td>trx_lock</td>
+<td>float</td>
+<td>注文中のTRX数量</td>
 </tr>
 <tr>
-<td>404</td>
-<td>IP制限はリソースを要求していません</td>
+<td>jpy_balance</td>
+<td>float</td>
+<td>日本円残高</td>
 </tr>
 <tr>
-<td>900</td>
-<td>アカウントが解約されています</td>
-</tr>
-<tr>
-<td>901</td>
-<td>取引が一時的に停止されています</td>
+<td>jpy_lock</td>
+<td>float</td>
+<td>注文中の日本円数量</td>
 </tr>
 </tbody>
 </table>
-<h2 id="response-example">Response example</h2>
-<ul>
-<li>取扱銘柄の指定に誤りがあります。（Code：102、Description：コインが存在しません）</li>
-</ul>
+<h4 id="response-example">Response example</h4>
 <pre><code class="lang-json">{
-  <span class="hljs-string">&quot;result&quot;</span>: <span class="hljs-literal">false</span>,
-  <span class="hljs-string">&quot;code&quot;</span>: <span class="hljs-string">&quot;102&quot;</span>
+    <span class="hljs-string">&quot;uid&quot;</span>: <span class="hljs-number">1</span>,
+    <span class="hljs-string">&quot;nameauth&quot;</span>: <span class="hljs-number">1</span>,
+    <span class="hljs-string">&quot;moflag&quot;</span>: <span class="hljs-number">1</span>,
+    <span class="hljs-string">&quot;btc_balance&quot;</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-string">&quot;btc_lock&quot;</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-string">&quot;bch_balance&quot;</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-string">&quot;bch_lock&quot;</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-string">&quot;ltc_balance&quot;</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-string">&quot;ltc_lock&quot;</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-string">&quot;eth_balance&quot;</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-string">&quot;eth_lock&quot;</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-string">&quot;doge_balance&quot;</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-string">&quot;doge_lock&quot;</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-string">&quot;dot_balance&quot;</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-string">&quot;dot_lock&quot;</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-string">&quot;trx_balance&quot;</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-string">&quot;trx_lock&quot;</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-string">&quot;jpy_balance&quot;</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-string">&quot;jpy_lock&quot;</span>: <span class="hljs-number">0</span>
 }
 </code></pre>
+<h4 id="errors">Errors</h4>
+<p><a href="error_code.html">Error Code</a>を参照してください。</p>
 
                                 
                                 </section>
@@ -402,12 +510,12 @@
 
             
                 
-                <a href="balance.html" class="navigation navigation-prev " aria-label="Previous page: Balance（残高の取得）">
+                <a href="private.html" class="navigation navigation-prev " aria-label="Previous page: HTTP Private API">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
                 
-                <a href="disclaimer.html" class="navigation navigation-next " aria-label="Next page: 免責事項">
+                <a href="error_code.html" class="navigation navigation-next " aria-label="Next page: Error Code">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -418,7 +526,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Error Code","level":"1.4","depth":1,"next":{"title":"免責事項","level":"1.5","depth":1,"path":"doc/disclaimer.md","ref":"doc/disclaimer.md","articles":[]},"previous":{"title":"Balance（残高の取得）","level":"1.3.1","depth":2,"path":"doc/balance.md","ref":"doc/balance.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"doc/error_code.md","mtime":"2022-09-18T15:07:45.377Z","type":"markdown"},"gitbook":{"version":"4.0.0","time":"2022-10-06T13:41:46.682Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Balance（残高の取得）","level":"1.3.1","depth":2,"next":{"title":"Error Code","level":"1.4","depth":1,"path":"doc/error_code.md","ref":"doc/error_code.md","articles":[]},"previous":{"title":"HTTP Private API","level":"1.3","depth":1,"path":"doc/private.md","ref":"doc/private.md","articles":[{"title":"Balance（残高の取得）","level":"1.3.1","depth":2,"path":"doc/balance.md","ref":"doc/balance.md","articles":[]}]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"doc/balance.md","mtime":"2022-10-06T13:36:35.327Z","type":"markdown"},"gitbook":{"version":"4.0.0","time":"2022-10-06T13:41:46.682Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
