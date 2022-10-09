@@ -3,7 +3,7 @@
 <html lang="" >
     <head>
         <meta charset="UTF-8">
-        <title>HTTP Public API · HonKit</title>
+        <title>Trade view（注文の詳細情報を取得） · HonKit</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="HonKit 4.0.0">
@@ -56,10 +56,10 @@
     <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="ticker.html" />
+    <link rel="next" href="error_code.html" />
     
     
-    <link rel="prev" href="../" />
+    <link rel="prev" href="trade_list.html" />
     
 
     </head>
@@ -101,7 +101,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.2" data-path="public.html">
+        <li class="chapter " data-level="1.2" data-path="public.html">
             
                 <a href="public.html">
             
@@ -212,7 +212,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.3.3" data-path="trade_view.html">
+        <li class="chapter active" data-level="1.3.3" data-path="trade_view.html">
             
                 <a href="trade_view.html">
             
@@ -286,7 +286,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href=".." >HTTP Public API</a>
+        <a href=".." >Trade view（注文の詳細情報を取得）</a>
     </h1>
 </div>
 
@@ -301,13 +301,147 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h2 id="http-public-api">HTTP Public API</h2>
-<ul>
-<li><a href="ticker.html">Ticker（取扱銘柄のリアルタイムレートを取得）</a></li>
-<li><a href="tickers.html">Tickers（全取扱銘柄のリアルタイムレートを取得）</a></li>
-<li><a href="orderbook.html">Orderbook（取扱銘柄の板情報を取得）</a></li>
-<li><a href="orders.html">Orders（取扱銘柄の約定履歴を取得）</a></li>
-</ul>
+                                <h3 id="trade-view（注文の詳細情報を取得）">Trade view（注文の詳細情報を取得）</h3>
+<p>指定された注文の詳細情報を取得できます。</p>
+<h4 id="request">Request</h4>
+<p>```http request
+GET /api/v1/trade_view</p>
+<pre><code>
+#### Request parameters
+
+| Name      | Type | Required | Description                                       |
+|-----------|------|----------|---------------------------------------------------|
+| coin      | str  | no       | 取扱銘柄：btc、bch、ltc、eth、doge、dot、trxのいずれか（デフォルトはbtc） |
+| id        | str  | yes      | 注文ID                                              |
+| key       | str  | yes      | APIキー（公開鍵）                                        |
+| nonce     | str  | yes      | ノンス                                               |
+| signature | str  | yes      | 署名                                                |
+
+#### Request example
+
+```python
+import datetime
+import hashlib
+import hmac
+import json
+import traceback
+import urllib
+
+import configparser
+import requests
+
+
+config: configparser.ConfigParser = configparser.ConfigParser()
+config.read(&quot;config.ini&quot;)
+apikey_public: str = config.get(&quot;DEEP&quot;, &quot;key&quot;)
+apikey_secret: str = config.get(&quot;DEEP&quot;, &quot;sec&quot;)
+symbol: str = config.get(&quot;DEEP&quot;, &quot;coin&quot;)
+
+endpoint: str = &quot;https://www.btcbox.co.jp/api/v1&quot;
+path: str = &quot;/trade_view&quot;
+url: str = &quot;&quot;.join([
+    endpoint,
+    path,
+])
+timeout: float = 3.0
+status_code: int = 200
+
+timestamp: float = datetime.datetime.now().timestamp() * 1000
+body: dict = {
+    &quot;coin&quot;: symbol,
+    &quot;id&quot;: &quot;11&quot;,
+    &quot;key&quot;: apikey_public,
+    &quot;nonce&quot;: timestamp,
+}
+
+secret_md5: str = bytearray(hashlib.md5(apikey_secret.encode(&quot;utf-8&quot;)).hexdigest(), &quot;ascii&quot;)
+text: bytearray = bytearray(urllib.parse.urlencode(body), &quot;ascii&quot;)
+sign: str = urllib.parse.quote(hmac.new(secret_md5, text, hashlib.sha256).hexdigest())
+body[&quot;signature&quot;] = sign
+
+res: requests.models.Response = None
+try:
+    res = requests.post(url=url, data=body, timeout=timeout)
+    res.raise_for_status()
+except requests.exceptions.Timeout:
+    data: dict = {
+        &quot;error&quot;: &quot;Request timeout&quot;,
+        &quot;response&quot;: str(res),
+        &quot;url&quot;: url,
+    }
+    status_code = 408
+except requests.exceptions.RequestException as exception:
+    data: dict = {
+        &quot;error&quot;: traceback.format_exception_only(type(exception), exception)[0],
+        &quot;response&quot;: str(res),
+        &quot;url&quot;: url,
+    }
+    status_code = 500
+else:
+    data: dict = json.loads(res.text)
+
+print((data, status_code))
+</code></pre><h4 id="response">Response</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>str</td>
+<td>注文ID</td>
+</tr>
+<tr>
+<td>datetime</td>
+<td>str</td>
+<td>注文日時（yyyy-mm-dd hh:mm:ss形式）</td>
+</tr>
+<tr>
+<td>type</td>
+<td>str</td>
+<td>売買区分（sellまたはbuy）</td>
+</tr>
+<tr>
+<td>price</td>
+<td>int</td>
+<td>注文価格</td>
+</tr>
+<tr>
+<td>amount_original</td>
+<td>float</td>
+<td>注文数量</td>
+</tr>
+<tr>
+<td>amount_outstanding</td>
+<td>float</td>
+<td>未約定数量</td>
+</tr>
+<tr>
+<td>status</td>
+<td>str</td>
+<td>注文状態（wait: 未約定, part: 未約定または一部約定, cancelled: 取消済み, all: 全て約定済み）</td>
+</tr>
+</tbody>
+</table>
+<h4 id="response-example">Response example</h4>
+<pre><code class="lang-json">{  
+   <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">11</span>,
+   <span class="hljs-string">&quot;datetime&quot;</span>: <span class="hljs-string">&quot;2014-10-21 10:47:20&quot;</span>,
+   <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;sell&quot;</span>,
+   <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">42000</span>,
+   <span class="hljs-string">&quot;amount_original&quot;</span>: <span class="hljs-number">1.2</span>,
+   <span class="hljs-string">&quot;amount_outstanding&quot;</span>: <span class="hljs-number">0</span>,
+   <span class="hljs-string">&quot;status&quot;</span>: <span class="hljs-string">&quot;all&quot;</span>,
+   <span class="hljs-string">&quot;trades&quot;</span>: []
+}
+</code></pre>
+<h4 id="errors">Errors</h4>
+<p><a href="error_code.html">Error Code</a>を参照してください。</p>
 
                                 
                                 </section>
@@ -335,12 +469,12 @@
 
             
                 
-                <a href="../" class="navigation navigation-prev " aria-label="Previous page: Overview">
+                <a href="trade_list.html" class="navigation navigation-prev " aria-label="Previous page: Trade list（注文一覧の取得）">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
                 
-                <a href="ticker.html" class="navigation navigation-next " aria-label="Next page: Ticker（取扱銘柄のリアルタイムレートを取得）">
+                <a href="error_code.html" class="navigation navigation-next " aria-label="Next page: Error Code">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -351,7 +485,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"HTTP Public API","level":"1.2","depth":1,"next":{"title":"Ticker（取扱銘柄のリアルタイムレートを取得）","level":"1.2.1","depth":2,"path":"doc/ticker.md","ref":"doc/ticker.md","articles":[]},"previous":{"title":"Overview","level":"1.1","depth":1,"path":"README.md","ref":"README.md","articles":[]},"articles":[{"title":"Ticker（取扱銘柄のリアルタイムレートを取得）","level":"1.2.1","depth":2,"path":"doc/ticker.md","ref":"doc/ticker.md","articles":[]},{"title":"Tickers（全取扱銘柄のリアルタイムレートを取得）","level":"1.2.2","depth":2,"path":"doc/tickers.md","ref":"doc/tickers.md","articles":[]},{"title":"Orderbook（取扱銘柄の板情報を取得）","level":"1.2.3","depth":2,"path":"doc/orderbook.md","ref":"doc/orderbook.md","articles":[]},{"title":"Orders（取扱銘柄の約定履歴を取得）","level":"1.2.4","depth":2,"path":"doc/orders.md","ref":"doc/orders.md","articles":[]}],"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"doc/public.md","mtime":"2022-09-23T04:12:27.145Z","type":"markdown"},"gitbook":{"version":"4.0.0","time":"2022-10-09T14:32:53.026Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Trade view（注文の詳細情報を取得）","level":"1.3.3","depth":2,"next":{"title":"Error Code","level":"1.4","depth":1,"path":"doc/error_code.md","ref":"doc/error_code.md","articles":[]},"previous":{"title":"Trade list（注文一覧の取得）","level":"1.3.2","depth":2,"path":"doc/trade_list.md","ref":"doc/trade_list.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"doc/trade_view.md","mtime":"2022-10-09T14:31:43.157Z","type":"markdown"},"gitbook":{"version":"4.0.0","time":"2022-10-09T14:32:53.026Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

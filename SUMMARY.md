@@ -9,5 +9,6 @@
 * [HTTP Private API](doc/private.md)
   * [Balance（残高の取得）](doc/balance.md)
   * [Trade list（注文一覧の取得）](doc/trade_list.md)
+  * [Trade view（注文の詳細情報を取得）](doc/trade_view.md)
 * [Error Code](doc/error_code.md)
 * [免責事項](doc/disclaimer.md)
