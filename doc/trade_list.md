@@ -35,9 +35,9 @@ import requests
 
 config: configparser.ConfigParser = configparser.ConfigParser()
 config.read("config.ini")
-apikey_public = config.get("DEEP", "key")
-apikey_secret = config.get("DEEP", "sec")
-symbol = config.get("DEEP", "coin")
+apikey_public: str = config.get("DEEP", "key")
+apikey_secret: str = config.get("DEEP", "sec")
+symbol: str = config.get("DEEP", "coin")
 
 endpoint: str = "https://www.btcbox.co.jp/api/v1"
 path: str = "/trade_list"
