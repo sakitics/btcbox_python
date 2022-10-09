@@ -3,7 +3,7 @@
 <html lang="" >
     <head>
         <meta charset="UTF-8">
-        <title>Tickers（全取扱銘柄のリアルタイムレートを取得） · HonKit</title>
+        <title>Wallet（アドレスの取得） · HonKit</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="HonKit 4.0.0">
@@ -56,10 +56,10 @@
     <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="orderbook.html" />
+    <link rel="next" href="trade_list.html" />
     
     
-    <link rel="prev" href="ticker.html" />
+    <link rel="prev" href="balance.html" />
     
 
     </head>
@@ -128,7 +128,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.2.2" data-path="tickers.html">
+        <li class="chapter " data-level="1.2.2" data-path="tickers.html">
             
                 <a href="tickers.html">
             
@@ -199,7 +199,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.3.2" data-path="wallet.html">
+        <li class="chapter active" data-level="1.3.2" data-path="wallet.html">
             
                 <a href="wallet.html">
             
@@ -299,7 +299,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href=".." >Tickers（全取扱銘柄のリアルタイムレートを取得）</a>
+        <a href=".." >Wallet（アドレスの取得）</a>
     </h1>
 </div>
 
@@ -314,26 +314,43 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h3 id="tickers（全取扱銘柄のリアルタイムレートを取得）">Tickers（全取扱銘柄のリアルタイムレートを取得）</h3>
-<p>全取扱銘柄のリアルタイムレートを取得します。</p>
+                                <h3 id="wallet（アドレスの取得）">Wallet（アドレスの取得）</h3>
+<p>指定された暗号資産のBTCBOXアカウント内の入金アドレスを取得できます。</p>
 <h4 id="request">Request</h4>
 <p>```http request
-GET /api/v1/tickers</p>
+GET /api/v1/wallet</p>
 <pre><code>
 #### Request parameters
+
+| Name      | Type | Required | Description                                       |
+|-----------|------|----------|---------------------------------------------------|
+| coin      | str  | no       | 取扱銘柄：btc、bch、ltc、eth、doge、dot、trxのいずれか（デフォルトはbtc） |
+| key       | str  | yes      | APIキー（公開鍵）                                        |
+| nonce     | str  | yes      | ノンス                                               |
+| signature | str  | yes      | 署名                                                |
 
 #### Request example
 
 ```python
+import datetime
+import hashlib
+import hmac
 import json
 import traceback
-import urllib.parse
+import urllib
 
+import configparser
 import requests
 
 
+config: configparser.ConfigParser = configparser.ConfigParser()
+config.read(&quot;config.ini&quot;)
+apikey_public: str = config.get(&quot;DEEP&quot;, &quot;key&quot;)
+apikey_secret: str = config.get(&quot;DEEP&quot;, &quot;sec&quot;)
+symbol: str = config.get(&quot;DEEP&quot;, &quot;coin&quot;)
+
 endpoint: str = &quot;https://www.btcbox.co.jp/api/v1&quot;
-path: str = &quot;/tickers&quot;
+path: str = &quot;/wallet&quot;
 url: str = &quot;&quot;.join([
     endpoint,
     path,
@@ -341,9 +358,21 @@ url: str = &quot;&quot;.join([
 timeout: float = 3.0
 status_code: int = 200
 
+timestamp: float = datetime.datetime.now().timestamp() * 1000
+body: dict = {
+    &quot;coin&quot;: symbol,
+    &quot;key&quot;: apikey_public,
+    &quot;nonce&quot;: timestamp,
+}
+
+secret_md5: str = bytearray(hashlib.md5(apikey_secret.encode(&quot;utf-8&quot;)).hexdigest(), &quot;ascii&quot;)
+text: bytearray = bytearray(urllib.parse.urlencode(body), &quot;ascii&quot;)
+sign: str = urllib.parse.quote(hmac.new(secret_md5, text, hashlib.sha256).hexdigest())
+body[&quot;signature&quot;] = sign
+
 res: requests.models.Response = None
 try:
-    res = requests.get(url=url, timeout=timeout)
+    res = requests.post(url=url, data=body, timeout=timeout)
     res.raise_for_status()
 except requests.exceptions.Timeout:
     data: dict = {
@@ -374,100 +403,21 @@ print((data, status_code))
 </thead>
 <tbody>
 <tr>
-<td>pair</td>
+<td>result</td>
+<td>bool</td>
+<td>処理結果（true: 成功, false: 失敗）</td>
+</tr>
+<tr>
+<td>address</td>
 <td>str</td>
-<td>銘柄名（BTC_JPY、BCH_JPYなど）</td>
-</tr>
-<tr>
-<td>high</td>
-<td>int</td>
-<td>24時間の高値</td>
-</tr>
-<tr>
-<td>low</td>
-<td>int</td>
-<td>24時間の安値</td>
-</tr>
-<tr>
-<td>buy</td>
-<td>int</td>
-<td>買い気配値</td>
-</tr>
-<tr>
-<td>sell</td>
-<td>int</td>
-<td>売り気配値</td>
-</tr>
-<tr>
-<td>last</td>
-<td>int</td>
-<td>最新の約定価格</td>
-</tr>
-<tr>
-<td>vol</td>
-<td>float</td>
-<td>24時間の出来高</td>
+<td>入金アドレス</td>
 </tr>
 </tbody>
 </table>
 <h4 id="response-example">Response example</h4>
 <pre><code class="lang-json">{
-    <span class="hljs-string">&quot;BTC_JPY&quot;</span>: {
-        <span class="hljs-string">&quot;high&quot;</span>: <span class="hljs-number">2884823</span>,
-        <span class="hljs-string">&quot;low&quot;</span>: <span class="hljs-number">2826940</span>,
-        <span class="hljs-string">&quot;buy&quot;</span>: <span class="hljs-number">2850313</span>,
-        <span class="hljs-string">&quot;sell&quot;</span>: <span class="hljs-number">2847378</span>,
-        <span class="hljs-string">&quot;last&quot;</span>: <span class="hljs-number">2847399</span>,
-        <span class="hljs-string">&quot;vol&quot;</span>: <span class="hljs-number">559.1379</span>
-    },
-    <span class="hljs-string">&quot;BCH_JPY&quot;</span>: {
-        <span class="hljs-string">&quot;high&quot;</span>: <span class="hljs-number">17646</span>,
-        <span class="hljs-string">&quot;low&quot;</span>: <span class="hljs-number">16889</span>,
-        <span class="hljs-string">&quot;buy&quot;</span>: <span class="hljs-number">16820</span>,
-        <span class="hljs-string">&quot;sell&quot;</span>: <span class="hljs-number">17155</span>,
-        <span class="hljs-string">&quot;last&quot;</span>: <span class="hljs-number">17058</span>,
-        <span class="hljs-string">&quot;vol&quot;</span>: <span class="hljs-number">848.4548</span>
-    },
-    <span class="hljs-string">&quot;LTC_JPY&quot;</span>: {
-        <span class="hljs-string">&quot;high&quot;</span>: <span class="hljs-number">8357</span>,
-        <span class="hljs-string">&quot;low&quot;</span>: <span class="hljs-number">8011</span>,
-        <span class="hljs-string">&quot;buy&quot;</span>: <span class="hljs-number">8060</span>,
-        <span class="hljs-string">&quot;sell&quot;</span>: <span class="hljs-number">8149</span>,
-        <span class="hljs-string">&quot;last&quot;</span>: <span class="hljs-number">8102</span>,
-        <span class="hljs-string">&quot;vol&quot;</span>: <span class="hljs-number">783.9139</span>
-    },
-    <span class="hljs-string">&quot;ETH_JPY&quot;</span>: {
-        <span class="hljs-string">&quot;high&quot;</span>: <span class="hljs-number">243137</span>,
-        <span class="hljs-string">&quot;low&quot;</span>: <span class="hljs-number">210000</span>,
-        <span class="hljs-string">&quot;buy&quot;</span>: <span class="hljs-number">210000</span>,
-        <span class="hljs-string">&quot;sell&quot;</span>: <span class="hljs-number">246776</span>,
-        <span class="hljs-string">&quot;last&quot;</span>: <span class="hljs-number">228389</span>,
-        <span class="hljs-string">&quot;vol&quot;</span>: <span class="hljs-number">249.2947</span>
-    },
-    <span class="hljs-string">&quot;DOGE_JPY&quot;</span>: {
-        <span class="hljs-string">&quot;high&quot;</span>: <span class="hljs-number">8.92</span>,
-        <span class="hljs-string">&quot;low&quot;</span>: <span class="hljs-number">8.63</span>,
-        <span class="hljs-string">&quot;buy&quot;</span>: <span class="hljs-number">8.68</span>,
-        <span class="hljs-string">&quot;sell&quot;</span>: <span class="hljs-number">8.68</span>,
-        <span class="hljs-string">&quot;last&quot;</span>: <span class="hljs-number">8.68</span>,
-        <span class="hljs-string">&quot;vol&quot;</span>: <span class="hljs-number">21529.8022</span>
-    },
-    <span class="hljs-string">&quot;DOT_JPY&quot;</span>: {
-        <span class="hljs-string">&quot;high&quot;</span>: <span class="hljs-number">1023</span>,
-        <span class="hljs-string">&quot;low&quot;</span>: <span class="hljs-number">980</span>,
-        <span class="hljs-string">&quot;buy&quot;</span>: <span class="hljs-number">983</span>,
-        <span class="hljs-string">&quot;sell&quot;</span>: <span class="hljs-number">984</span>,
-        <span class="hljs-string">&quot;last&quot;</span>: <span class="hljs-number">984</span>,
-        <span class="hljs-string">&quot;vol&quot;</span>: <span class="hljs-number">21283.3837</span>
-    },
-    <span class="hljs-string">&quot;TRX_JPY&quot;</span>: {
-        <span class="hljs-string">&quot;high&quot;</span>: <span class="hljs-number">8.93</span>,
-        <span class="hljs-string">&quot;low&quot;</span>: <span class="hljs-number">8.79</span>,
-        <span class="hljs-string">&quot;buy&quot;</span>: <span class="hljs-number">8.91</span>,
-        <span class="hljs-string">&quot;sell&quot;</span>: <span class="hljs-number">8.91</span>,
-        <span class="hljs-string">&quot;last&quot;</span>: <span class="hljs-number">8.91</span>,
-        <span class="hljs-string">&quot;vol&quot;</span>: <span class="hljs-number">21447.7862</span>
-    }
+    <span class="hljs-string">&quot;result&quot;</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-string">&quot;address&quot;</span>: <span class="hljs-string">&quot;xxxxxxxxxxxxxxxxxxxxxxxxx&quot;</span>
 }
 </code></pre>
 <h4 id="errors">Errors</h4>
@@ -499,12 +449,12 @@ print((data, status_code))
 
             
                 
-                <a href="ticker.html" class="navigation navigation-prev " aria-label="Previous page: Ticker（取扱銘柄のリアルタイムレートを取得）">
+                <a href="balance.html" class="navigation navigation-prev " aria-label="Previous page: Balance（残高の取得）">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
                 
-                <a href="orderbook.html" class="navigation navigation-next " aria-label="Next page: Orderbook（取扱銘柄の板情報を取得）">
+                <a href="trade_list.html" class="navigation navigation-next " aria-label="Next page: Trade list（注文一覧の取得）">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -515,7 +465,7 @@ print((data, status_code))
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Tickers（全取扱銘柄のリアルタイムレートを取得）","level":"1.2.2","depth":2,"next":{"title":"Orderbook（取扱銘柄の板情報を取得）","level":"1.2.3","depth":2,"path":"doc/orderbook.md","ref":"doc/orderbook.md","articles":[]},"previous":{"title":"Ticker（取扱銘柄のリアルタイムレートを取得）","level":"1.2.1","depth":2,"path":"doc/ticker.md","ref":"doc/ticker.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"doc/tickers.md","mtime":"2022-10-09T09:06:44.915Z","type":"markdown"},"gitbook":{"version":"4.0.0","time":"2022-10-09T14:49:56.582Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Wallet（アドレスの取得）","level":"1.3.2","depth":2,"next":{"title":"Trade list（注文一覧の取得）","level":"1.3.3","depth":2,"path":"doc/trade_list.md","ref":"doc/trade_list.md","articles":[]},"previous":{"title":"Balance（残高の取得）","level":"1.3.1","depth":2,"path":"doc/balance.md","ref":"doc/balance.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"doc/wallet.md","mtime":"2022-10-09T14:48:09.045Z","type":"markdown"},"gitbook":{"version":"4.0.0","time":"2022-10-09T14:49:56.582Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
