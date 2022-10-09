@@ -5,7 +5,7 @@
 #### Request
 
 ```http request
-GET /ticker
+GET /api/v1/ticker
 ```
 
 #### Request parameters

@@ -5,7 +5,7 @@
 #### Request
 
 ```http request
-GET /depth
+GET /api/v1/depth
 ```
 
 #### Request parameters

@@ -1,148 +1,154 @@
 #!/usr/bin/python
 # -**- coding:utf8 -**-
-
 import time
-import configparser
-import requests
-import locale
-import json
 import hashlib
 import hmac
+import json
+from typing import Dict
 
-class Btcbox():
+import configparser
+import numpy
+import requests
 
-    def __init__(self):
 
-        config = configparser.ConfigParser()
-        config.read('config.ini')
-        self.base = config.get("DEEP", 'base')
-        self.symbol = config.get("DEEP", 'coin')
+class Btcbox:
 
-        self.sec = config.get("DEEP", 'sec')
-        self.key = config.get("DEEP", 'key')
+    def __init__(self) -> None:
 
-        self.symobl_coin = self.symbol.upper() + "/JPY"
+        config: configparser.ConfigParser = configparser.ConfigParser()
+        config.read("config.ini")
+        self.base: str = config.get("DEEP", "base")
+        self.symbol: str = config.get("DEEP", "coin")
+        self.key: str = config.get("DEEP", "key")
+        self.sec: str = config.get("DEEP", "sec")
 
-        print(self.symobl_coin)
-        
-    def nonce(self):
-        return str(int(time.time()*1000))
+        self.price: int = 0
+        self.symbol_coin: str = self.symbol.upper() + "/JPY"
 
-    def signature(self, param_dic):
-        msg = ''
-        for index,(k, v) in enumerate(param_dic.items()) :
-            msg += str(k) + "=" + str(v)
+        print(self.symbol_coin)
+
+    @staticmethod
+    def nonce() -> str:
+        return str(int(time.time() * 1000))
+
+    def signature(self, param_dic: Dict) -> str:
+        msg: str = ""
+        for index, (key, val) in enumerate(param_dic.items()):
+            msg += str(key) + "=" + str(val)
             if index < len(list(param_dic.keys())) - 1:
-                msg += '&'
+                msg += "&"
 
-        s = bytes(msg,'utf8')
-        api_secret_md5 =hashlib.md5(self.sec.encode()).hexdigest()
-        secret = bytes(api_secret_md5,'utf8')
-        return hmac.new(secret, s, digestmod=hashlib.sha256).hexdigest()
-    
-    def base_dic_sig(self):
+        param_bin: bytes = bytes(msg, "utf8")
+        api_secret_md5: str = hashlib.md5(self.sec.encode()).hexdigest()
+        secret: bytes = bytes(api_secret_md5, "utf8")
 
-        return {'key' : self.key, 'nonce':self.nonce()}
-        
+        return hmac.new(secret, param_bin,
+                        digestmod=hashlib.sha256).hexdigest()
 
-    # 1.1. Ticker Public
-    def ticker(self):
-        
-        url = self.base + '/api/v1/ticker/?coin=' + self.symbol
-        r = requests.get(url).json()
-        self.price = (r["buy"] + r["sell"])/2
-        print('ticker\nurl: %s\nresult: %s \nprice: %d \n---------------' %(url ,  json.dumps(r),self.price))
-        
-    # 1.2 Depth Public
-    def deep(self):
-        
-        url = self.base + '/api/v1/depth/?coin=' + self.symbol
-        r = requests.get(url).json()
-        print("deep\nurl: %s \ndeep:%s \n---------------" % (url, json.dumps(r)))
+    def base_dic_sig(self) -> Dict:
+        return {"key": self.key, "nonce": self.nonce()}
 
-    # 1.3 Orders Public
-    def orders(self):
-        url = self.base + '/api/v1/orders?coin=' + self.symbol
-        r = requests.get(url).json()
-        print("orders\nurl: %s \nresult: %s\n---------------" % (url, json.dumps(r)))
+    # 1.1 ticker public
+    def ticker(self) -> None:
+        url: str = self.base + "/api/v1/ticker/?coin=" + self.symbol
+        res: Dict = requests.get(url).json()
+        self.price = numpy.mean([res["buy"], res["sell"]])
+
+        print("ticker\n url: %s\n result: %s \n price: %d "
+              "\n---------------" % (url, json.dumps(res), self.price))
+
+    # 1.2 depth public
+    def deep(self) -> None:
+        url: str = self.base + "/api/v1/depth/?coin=" + self.symbol
+        res: Dict = requests.get(url).json()
+
+        print("deep\n url: %s \n deep: %s "
+              "\n---------------" % (url, json.dumps(res)))
+
+    # 1.3 orders public
+    def orders(self) -> None:
+        url: str = self.base + "/api/v1/orders?coin=" + self.symbol
+        res: Dict = requests.get(url).json()
+
+        print("orders\n url: %s \n result: %s "
+              "\n---------------" % (url, json.dumps(res)))
 
     # 1.4 balance
-    def balance(self):
-
-        url = self.base + '/api/v1/balance'
-        param = self.base_dic_sig()
+    def balance(self) -> None:
+        url: str = self.base + "/api/v1/balance"
+        param: Dict = self.base_dic_sig()
         param["signature"] = self.signature(param)
-        r = requests.post(url, param).json()
-        print('1.4 balance \nurl: %s \nresult:%s \n---------------' %(url,json.dumps(r)))
-    
-    # 1.5 Wallet
-    def wallet(self):
+        res: Dict = requests.post(url, param).json()
 
-        url = self.base + '/api/v1/wallet?coin=' + self.symbol
-        param = self.base_dic_sig()
+        print("balance\n url: %s \n result: %s "
+              "\n---------------" % (url, json.dumps(res)))
+
+    # 1.5 wallet
+    def wallet(self) -> None:
+        url: str = self.base + "/api/v1/wallet?coin=" + self.symbol
+        param: Dict = self.base_dic_sig()
         param["signature"] = self.signature(param)
-        r = requests.post(url, param).json()
-        print("1.5 Wallet url: %s \nresult: %s \n---------------"  % (url, r))
+        res: Dict = requests.post(url, param).json()
+
+        print("wallet\n url: %s \n result: %s "
+              "\n---------------" % (url, json.dumps(res)))
 
     # 1.6 trade_list
-    def trade_list(self):
-
-        url = self.base + '/api/v1/trade_list'
-        param = self.base_dic_sig()
+    def trade_list(self) -> None:
+        url: str = self.base + "/api/v1/trade_list"
+        param: Dict = self.base_dic_sig()
         param["signature"] = self.signature(param)
-        r = requests.post(url, param).json()
-        
-        print('1.6 trade_list \nurl: %s \nresult:%s \n---------------' %(url,json.dumps(r)))
-            
+        res: Dict = requests.post(url, param).json()
 
-     # 1.7. Trade_view
-    def trade_view(self,order_id):
+        print("trade_list\n url: %s \n result: %s "
+              "\n---------------" % (url, json.dumps(res)))
 
-        url = self.base + '/api/v1/trade_view'
-        param = self.base_dic_sig()
-
+    # 1.7 trade_view
+    def trade_view(self, order_id: str = "") -> None:
+        url: str = self.base + "/api/v1/trade_view"
+        param: Dict = self.base_dic_sig()
         param["id"] = order_id
         param["signature"] = self.signature(param)
-        r = requests.post(url, param).json()
+        res: Dict = requests.post(url, param).json()
 
-        print("1.7 Trade_view \nurl: %s \nresult: %s \n---------------" % (url,r))
-       
-    # 1.8. Trade_cancel
-    def trade_cancel(self, order_id):
+        print("trade_view\n url: %s \n result: %s "
+              "\n---------------" % (url, json.dumps(res)))
 
-        url = self.base + '/api/v1/trade_cancel'
-        param = self.base_dic_sig()
-
+    # 1.8 trade_cancel
+    def trade_cancel(self, order_id: str = "") -> None:
+        url: str = self.base + "/api/v1/trade_cancel"
+        param: Dict = self.base_dic_sig()
         param["id"] = order_id
         param["signature"] = self.signature(param)
-        r = requests.post(url, param).json()
-        print("1.8 trade_cancel \nurl: %s \nresult: %s \n---------------" % (url,r))
+        res: Dict = requests.post(url, param).json()
 
-    # 1.9. Trade_add
-    def trade_add(self,direction,amount,price):
+        print("trade_cancel\n url: %s \n result: %s "
+              "\n---------------" % (url, json.dumps(res)))
 
-        url = self.base + '/api/v1/trade_add'
+    # 1.9 trade_add
+    def trade_add(self, direction: str = "buy", amount: float = 0.0,
+                  price: int = 0) -> None:
+        url = self.base + "/api/v1/trade_add"
         param = self.base_dic_sig()
-
-        param["amount"] = amount
+        param["amount"] = float(amount)
         param["coin"] = self.symbol
         param["type"] = direction
-        param["price"] = price
+        param["price"] = int(numpy.ceil(price))
         param["signature"] = self.signature(param)
-        r = requests.post(url, param).json()
-        print("1.9 trade_add \nurl: %s \nresult: %s \n---------------" %(url,r))
+        res: Dict = requests.post(url, param).json()
 
-    
+        print("trade_add\n url: %s \n result: %s "
+              "\n---------------" % (url, json.dumps(res)))
+
 
 if __name__ == "__main__":
 
     box = Btcbox()
-    
-    try:
 
-        # 1.1. Ticker
+    try:
+        # 1.1 ticker
         box.ticker()
-        # 1.2. Depth
+        # 1.2 depth
         box.deep()
         # 1.3 orders
         box.orders()
@@ -152,14 +158,18 @@ if __name__ == "__main__":
         box.wallet()
         # 1.6 trade_list
         box.trade_list()
-        
         # 1.7 trade_view
-        box.trade_view('889554')
+        box.trade_view("889554")
         # 1.8 trade_cancel
-        box.trade_cancel('889554')
+        box.trade_cancel("889554")
+        # 1.9 trade_add
+        box.trade_add("buy", 0.001, box.price)
 
-        # 1.9 Trade_add
-        box.trade_add('buy', 0.001,box.price)
+    except Exception as exc:
+        print("error：" + str(exc))
 
-    except Exception as e:
-        print("error：" + str(e))
+    else:
+        pass
+
+    finally:
+        del box
