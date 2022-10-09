@@ -5,7 +5,7 @@
 #### Request
 
 ```http request
-GET /orders
+GET /api/v1/orders
 ```
 
 #### Request parameters

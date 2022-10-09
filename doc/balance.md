@@ -5,7 +5,7 @@
 #### Request
 
 ```http request
-GET /balance
+GET /api/v1/balance
 ```
 
 #### Request parameters
@@ -42,8 +42,8 @@ status_code: int = 200
 
 config = configparser.ConfigParser()
 config.read("config.ini")
-apikey_public = config.get("DEEP", 'key')
-apikey_secret = config.get("DEEP", 'sec')
+apikey_public = config.get("DEEP", "key")
+apikey_secret = config.get("DEEP", "sec")
 
 timestamp = datetime.datetime.now().timestamp()
 body = {

@@ -5,7 +5,7 @@
 #### Request
 
 ```http request
-GET /tickers
+GET /api/v1/tickers
 ```
 
 #### Request parameters
