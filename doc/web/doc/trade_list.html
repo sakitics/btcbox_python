@@ -3,7 +3,7 @@
 <html lang="" >
     <head>
         <meta charset="UTF-8">
-        <title>Error Code · HonKit</title>
+        <title>Trade list（注文一覧の取得） · HonKit</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="HonKit 4.0.0">
@@ -56,10 +56,10 @@
     <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="disclaimer.html" />
+    <link rel="next" href="error_code.html" />
     
     
-    <link rel="prev" href="trade_list.html" />
+    <link rel="prev" href="balance.html" />
     
 
     </head>
@@ -199,7 +199,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.3.2" data-path="trade_list.html">
+        <li class="chapter active" data-level="1.3.2" data-path="trade_list.html">
             
                 <a href="trade_list.html">
             
@@ -217,7 +217,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.4" data-path="error_code.html">
+        <li class="chapter " data-level="1.4" data-path="error_code.html">
             
                 <a href="error_code.html">
             
@@ -273,7 +273,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href=".." >Error Code</a>
+        <a href=".." >Trade list（注文一覧の取得）</a>
     </h1>
 </div>
 
@@ -288,106 +288,176 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="error-code">Error Code</h1>
+                                <h3 id="trade-list（注文一覧の取得）">Trade list（注文一覧の取得）</h3>
+<p>最新の注文から指定日時まで最大100件の注文情報を取得できます。</p>
+<h4 id="request">Request</h4>
+<p>```http request
+GET /api/v1/trade_list</p>
+<pre><code>
+#### Request parameters
+
+| Name      | Type  | Required | Description                                       |
+|-----------|-------|----------|---------------------------------------------------|
+| coin      | str   | no       | 取扱銘柄：btc、bch、ltc、eth、doge、dot、trxのいずれか（デフォルトはbtc） |
+| since     | float | no       | 指定日時、UNIX時間で指定（デフォルトは0）                           |
+| type      | str   | no       | 指定状態（allまたはopen）                                  |
+| key       | str   | yes      | APIキー（公開鍵）                                        |
+| nonce     | str   | yes      | ノンス                                               |
+| signature | str   | yes      | 署名                                                |
+
+#### Request example
+
+```python
+import datetime
+import hashlib
+import hmac
+import json
+import traceback
+import urllib
+
+import configparser
+import requests
+
+
+config: configparser.ConfigParser = configparser.ConfigParser()
+config.read(&quot;config.ini&quot;)
+apikey_public: str = config.get(&quot;DEEP&quot;, &quot;key&quot;)
+apikey_secret: str = config.get(&quot;DEEP&quot;, &quot;sec&quot;)
+symbol: str = config.get(&quot;DEEP&quot;, &quot;coin&quot;)
+
+endpoint: str = &quot;https://www.btcbox.co.jp/api/v1&quot;
+path: str = &quot;/trade_list&quot;
+url: str = &quot;&quot;.join([
+    endpoint,
+    path,
+])
+timeout: float = 3.0
+status_code: int = 200
+
+timestamp: float = datetime.datetime.now().timestamp() * 1000
+body: dict = {
+    &quot;coin&quot;: symbol,
+    &quot;since&quot;: 1394031600,
+    &quot;type&quot;: &quot;all&quot;,
+    &quot;key&quot;: apikey_public,
+    &quot;nonce&quot;: timestamp,
+}
+
+secret_md5: str = bytearray(hashlib.md5(apikey_secret.encode(&quot;utf-8&quot;)).hexdigest(), &quot;ascii&quot;)
+text: bytearray = bytearray(urllib.parse.urlencode(body), &quot;ascii&quot;)
+sign: str = urllib.parse.quote(hmac.new(secret_md5, text, hashlib.sha256).hexdigest())
+body[&quot;signature&quot;] = sign
+
+res: requests.models.Response = None
+try:
+    res = requests.post(url=url, data=body, timeout=timeout)
+    res.raise_for_status()
+except requests.exceptions.Timeout:
+    data: dict = {
+        &quot;error&quot;: &quot;Request timeout&quot;,
+        &quot;response&quot;: str(res),
+        &quot;url&quot;: url,
+    }
+    status_code = 408
+except requests.exceptions.RequestException as exception:
+    data: dict = {
+        &quot;error&quot;: traceback.format_exception_only(type(exception), exception)[0],
+        &quot;response&quot;: str(res),
+        &quot;url&quot;: url,
+    }
+    status_code = 500
+else:
+    data: dict = json.loads(res.text)
+
+print((data, status_code))
+</code></pre><h4 id="response">Response</h4>
 <table>
 <thead>
 <tr>
-<th>Code</th>
+<th>Name</th>
+<th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>100</td>
-<td>必須パラメーターを空にすることはできません</td>
+<td>id</td>
+<td>str</td>
+<td>注文ID</td>
 </tr>
 <tr>
-<td>101</td>
-<td>無効なパラメータです</td>
+<td>datetime</td>
+<td>str</td>
+<td>注文日時（yyyy-mm-dd hh:mm:ss形式）</td>
 </tr>
 <tr>
-<td>102</td>
-<td>コインが存在しません</td>
+<td>type</td>
+<td>str</td>
+<td>売買区分（sellまたはbuy）</td>
 </tr>
 <tr>
-<td>103</td>
-<td>キーが存在しません</td>
+<td>price</td>
+<td>int</td>
+<td>注文価格</td>
 </tr>
 <tr>
-<td>104</td>
-<td>署名が一致しません</td>
+<td>amount_original</td>
+<td>float</td>
+<td>注文数量</td>
 </tr>
 <tr>
-<td>105</td>
-<td>権限がありません</td>
-</tr>
-<tr>
-<td>106</td>
-<td>リクエストが期限切れになりました（nonce error）</td>
-</tr>
-<tr>
-<td>107</td>
-<td>注文価格が0以下になっています</td>
-</tr>
-<tr>
-<td>200</td>
-<td>残高が不足しています</td>
-</tr>
-<tr>
-<td>201</td>
-<td>取引数が少なすぎます</td>
-</tr>
-<tr>
-<td>202</td>
-<td>注文価格が市場価格上下20%の範囲を超えています</td>
-</tr>
-<tr>
-<td>203</td>
-<td>注文が存在しません</td>
-</tr>
-<tr>
-<td>301</td>
-<td>本人確認が完了していません</td>
-</tr>
-<tr>
-<td>302</td>
-<td>本人確認書類の有効期限が切れています</td>
-</tr>
-<tr>
-<td>401</td>
-<td>システムエラー</td>
-</tr>
-<tr>
-<td>402</td>
-<td>リクエスト回数が上限を上回っています</td>
-</tr>
-<tr>
-<td>403</td>
-<td>非オープンAPIです</td>
-</tr>
-<tr>
-<td>404</td>
-<td>IP制限はリソースを要求していません</td>
-</tr>
-<tr>
-<td>900</td>
-<td>アカウントが解約されています</td>
-</tr>
-<tr>
-<td>901</td>
-<td>取引が一時的に停止されています</td>
+<td>amount_outstanding</td>
+<td>float</td>
+<td>未約定数量</td>
 </tr>
 </tbody>
 </table>
-<h2 id="response-example">Response example</h2>
-<ul>
-<li>取扱銘柄の指定に誤りがあります。（Code：102、Description：コインが存在しません）</li>
-</ul>
-<pre><code class="lang-json">{
-  <span class="hljs-string">&quot;result&quot;</span>: <span class="hljs-literal">false</span>,
-  <span class="hljs-string">&quot;code&quot;</span>: <span class="hljs-string">&quot;102&quot;</span>
-}
+<h4 id="response-example">Response example</h4>
+<pre><code class="lang-json">[  
+   {  
+      <span class="hljs-string">&quot;id&quot;</span>:<span class="hljs-string">&quot;7&quot;</span>,
+      <span class="hljs-string">&quot;datetime&quot;</span>:<span class="hljs-string">&quot;2014-10-20 13:27:38&quot;</span>,
+      <span class="hljs-string">&quot;type&quot;</span>:<span class="hljs-string">&quot;buy&quot;</span>,
+      <span class="hljs-string">&quot;price&quot;</span>:<span class="hljs-number">42750</span>,
+      <span class="hljs-string">&quot;amount_original&quot;</span>:<span class="hljs-number">0.235</span>,
+      <span class="hljs-string">&quot;amount_outstanding&quot;</span>:<span class="hljs-number">0.235</span>
+   },
+   {  
+      <span class="hljs-string">&quot;id&quot;</span>:<span class="hljs-string">&quot;6&quot;</span>,
+      <span class="hljs-string">&quot;datetime&quot;</span>:<span class="hljs-string">&quot;2014-10-20 13:27:15&quot;</span>,
+      <span class="hljs-string">&quot;type&quot;</span>:<span class="hljs-string">&quot;buy&quot;</span>,
+      <span class="hljs-string">&quot;price&quot;</span>:<span class="hljs-number">43299</span>,
+      <span class="hljs-string">&quot;amount_original&quot;</span>:<span class="hljs-number">4.789</span>,
+      <span class="hljs-string">&quot;amount_outstanding&quot;</span>:<span class="hljs-number">4.789</span>
+   },
+   {  
+      <span class="hljs-string">&quot;id&quot;</span>:<span class="hljs-string">&quot;5&quot;</span>,
+      <span class="hljs-string">&quot;datetime&quot;</span>:<span class="hljs-string">&quot;2014-10-20 13:26:52&quot;</span>,
+      <span class="hljs-string">&quot;type&quot;</span>:<span class="hljs-string">&quot;buy&quot;</span>,
+      <span class="hljs-string">&quot;price&quot;</span>:<span class="hljs-number">42500</span>,
+      <span class="hljs-string">&quot;amount_original&quot;</span>:<span class="hljs-number">14</span>,
+      <span class="hljs-string">&quot;amount_outstanding&quot;</span>:<span class="hljs-number">14</span>
+   },
+   {  
+      <span class="hljs-string">&quot;id&quot;</span>:<span class="hljs-string">&quot;4&quot;</span>,
+      <span class="hljs-string">&quot;datetime&quot;</span>:<span class="hljs-string">&quot;2014-10-20 13:26:23&quot;</span>,
+      <span class="hljs-string">&quot;type&quot;</span>:<span class="hljs-string">&quot;buy&quot;</span>,
+      <span class="hljs-string">&quot;price&quot;</span>:<span class="hljs-number">43200</span>,
+      <span class="hljs-string">&quot;amount_original&quot;</span>:<span class="hljs-number">0.4813</span>,
+      <span class="hljs-string">&quot;amount_outstanding&quot;</span>:<span class="hljs-number">0.4813</span>
+   },
+   {  
+      <span class="hljs-string">&quot;id&quot;</span>:<span class="hljs-string">&quot;3&quot;</span>,
+      <span class="hljs-string">&quot;datetime&quot;</span>:<span class="hljs-string">&quot;2014-10-20 13:25:57&quot;</span>,
+      <span class="hljs-string">&quot;type&quot;</span>:<span class="hljs-string">&quot;buy&quot;</span>,
+      <span class="hljs-string">&quot;price&quot;</span>:<span class="hljs-number">43200</span>,
+      <span class="hljs-string">&quot;amount_original&quot;</span>:<span class="hljs-number">0.4813</span>,
+      <span class="hljs-string">&quot;amount_outstanding&quot;</span>:<span class="hljs-number">0.4813</span>
+   }
+]
 </code></pre>
+<h4 id="errors">Errors</h4>
+<p><a href="error_code.html">Error Code</a>を参照してください。</p>
 
                                 
                                 </section>
@@ -415,12 +485,12 @@
 
             
                 
-                <a href="trade_list.html" class="navigation navigation-prev " aria-label="Previous page: Trade list（注文一覧の取得）">
+                <a href="balance.html" class="navigation navigation-prev " aria-label="Previous page: Balance（残高の取得）">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
                 
-                <a href="disclaimer.html" class="navigation navigation-next " aria-label="Next page: 免責事項">
+                <a href="error_code.html" class="navigation navigation-next " aria-label="Next page: Error Code">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -431,7 +501,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Error Code","level":"1.4","depth":1,"next":{"title":"免責事項","level":"1.5","depth":1,"path":"doc/disclaimer.md","ref":"doc/disclaimer.md","articles":[]},"previous":{"title":"Trade list（注文一覧の取得）","level":"1.3.2","depth":2,"path":"doc/trade_list.md","ref":"doc/trade_list.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"doc/error_code.md","mtime":"2022-09-18T15:07:45.377Z","type":"markdown"},"gitbook":{"version":"4.0.0","time":"2022-10-09T10:59:08.808Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Trade list（注文一覧の取得）","level":"1.3.2","depth":2,"next":{"title":"Error Code","level":"1.4","depth":1,"path":"doc/error_code.md","ref":"doc/error_code.md","articles":[]},"previous":{"title":"Balance（残高の取得）","level":"1.3.1","depth":2,"path":"doc/balance.md","ref":"doc/balance.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"doc/trade_list.md","mtime":"2022-10-09T10:58:52.810Z","type":"markdown"},"gitbook":{"version":"4.0.0","time":"2022-10-09T10:59:08.808Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
