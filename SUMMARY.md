@@ -8,5 +8,6 @@
   * [Orders（取扱銘柄の約定履歴を取得）](doc/orders.md)
 * [HTTP Private API](doc/private.md)
   * [Balance（残高の取得）](doc/balance.md)
+  * [Trade list（注文一覧の取得）](doc/trade_list.md)
 * [Error Code](doc/error_code.md)
 * [免責事項](doc/disclaimer.md)

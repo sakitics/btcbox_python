@@ -56,7 +56,7 @@
     <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="error_code.html" />
+    <link rel="next" href="trade_list.html" />
     
     
     <link rel="prev" href="private.html" />
@@ -199,6 +199,19 @@
             
         </li>
     
+        <li class="chapter " data-level="1.3.2" data-path="trade_list.html">
+            
+                <a href="trade_list.html">
+            
+                    
+                    Trade list（注文一覧の取得）
+            
+                </a>
+            
+
+            
+        </li>
+    
 
             </ul>
             
@@ -279,7 +292,7 @@
 <p>保有している暗号資産と法定通貨の残高を取得できます。</p>
 <h4 id="request">Request</h4>
 <p>```http request
-GET /balance</p>
+GET /api/v1/balance</p>
 <pre><code>
 #### Request parameters
 
@@ -304,6 +317,11 @@ import configparser
 import requests
 
 
+config: configparser.ConfigParser = configparser.ConfigParser()
+config.read(&quot;config.ini&quot;)
+apikey_public: str = config.get(&quot;DEEP&quot;, &quot;key&quot;)
+apikey_secret: str = config.get(&quot;DEEP&quot;, &quot;sec&quot;)
+
 endpoint: str = &quot;https://www.btcbox.co.jp/api/v1&quot;
 path: str = &quot;/balance&quot;
 url: str = &quot;&quot;.join([
@@ -313,20 +331,15 @@ url: str = &quot;&quot;.join([
 timeout: float = 3.0
 status_code: int = 200
 
-config = configparser.ConfigParser()
-config.read(&quot;config.ini&quot;)
-apikey_public = config.get(&quot;DEEP&quot;, &apos;key&apos;)
-apikey_secret = config.get(&quot;DEEP&quot;, &apos;sec&apos;)
-
-timestamp = datetime.datetime.now().timestamp()
-body = {
+timestamp: float = datetime.datetime.now().timestamp() * 1000
+body: dict = {
     &quot;key&quot;: apikey_public,
     &quot;nonce&quot;: timestamp,
 }
 
-secret_md5 = bytearray(hashlib.md5(apikey_secret.encode(&quot;utf-8&quot;)).hexdigest(), &quot;ascii&quot;)
-text = bytearray(urllib.parse.urlencode(body), &quot;ascii&quot;)
-sign = urllib.parse.quote(hmac.new(secret_md5, text, hashlib.sha256).hexdigest())
+secret_md5: str = bytearray(hashlib.md5(apikey_secret.encode(&quot;utf-8&quot;)).hexdigest(), &quot;ascii&quot;)
+text: bytearray = bytearray(urllib.parse.urlencode(body), &quot;ascii&quot;)
+sign: str = urllib.parse.quote(hmac.new(secret_md5, text, hashlib.sha256).hexdigest())
 body[&quot;signature&quot;] = sign
 
 res: requests.models.Response = None
@@ -515,7 +528,7 @@ print((data, status_code))
                 </a>
                 
                 
-                <a href="error_code.html" class="navigation navigation-next " aria-label="Next page: Error Code">
+                <a href="trade_list.html" class="navigation navigation-next " aria-label="Next page: Trade list（注文一覧の取得）">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -526,7 +539,7 @@ print((data, status_code))
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Balance（残高の取得）","level":"1.3.1","depth":2,"next":{"title":"Error Code","level":"1.4","depth":1,"path":"doc/error_code.md","ref":"doc/error_code.md","articles":[]},"previous":{"title":"HTTP Private API","level":"1.3","depth":1,"path":"doc/private.md","ref":"doc/private.md","articles":[{"title":"Balance（残高の取得）","level":"1.3.1","depth":2,"path":"doc/balance.md","ref":"doc/balance.md","articles":[]}]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"doc/balance.md","mtime":"2022-10-06T13:36:35.327Z","type":"markdown"},"gitbook":{"version":"4.0.0","time":"2022-10-06T13:41:46.682Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Balance（残高の取得）","level":"1.3.1","depth":2,"next":{"title":"Trade list（注文一覧の取得）","level":"1.3.2","depth":2,"path":"doc/trade_list.md","ref":"doc/trade_list.md","articles":[]},"previous":{"title":"HTTP Private API","level":"1.3","depth":1,"path":"doc/private.md","ref":"doc/private.md","articles":[{"title":"Balance（残高の取得）","level":"1.3.1","depth":2,"path":"doc/balance.md","ref":"doc/balance.md","articles":[]},{"title":"Trade list（注文一覧の取得）","level":"1.3.2","depth":2,"path":"doc/trade_list.md","ref":"doc/trade_list.md","articles":[]}]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"doc/balance.md","mtime":"2022-10-09T09:21:05.749Z","type":"markdown"},"gitbook":{"version":"4.0.0","time":"2022-10-09T10:54:57.462Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

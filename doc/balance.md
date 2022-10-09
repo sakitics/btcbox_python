@@ -31,6 +31,11 @@ import configparser
 import requests
 
 
+config: configparser.ConfigParser = configparser.ConfigParser()
+config.read("config.ini")
+apikey_public: str = config.get("DEEP", "key")
+apikey_secret: str = config.get("DEEP", "sec")
+
 endpoint: str = "https://www.btcbox.co.jp/api/v1"
 path: str = "/balance"
 url: str = "".join([
@@ -40,20 +45,15 @@ url: str = "".join([
 timeout: float = 3.0
 status_code: int = 200
 
-config = configparser.ConfigParser()
-config.read("config.ini")
-apikey_public = config.get("DEEP", "key")
-apikey_secret = config.get("DEEP", "sec")
-
-timestamp = datetime.datetime.now().timestamp()
-body = {
+timestamp: float = datetime.datetime.now().timestamp() * 1000
+body: dict = {
     "key": apikey_public,
     "nonce": timestamp,
 }
 
-secret_md5 = bytearray(hashlib.md5(apikey_secret.encode("utf-8")).hexdigest(), "ascii")
-text = bytearray(urllib.parse.urlencode(body), "ascii")
-sign = urllib.parse.quote(hmac.new(secret_md5, text, hashlib.sha256).hexdigest())
+secret_md5: str = bytearray(hashlib.md5(apikey_secret.encode("utf-8")).hexdigest(), "ascii")
+text: bytearray = bytearray(urllib.parse.urlencode(body), "ascii")
+sign: str = urllib.parse.quote(hmac.new(secret_md5, text, hashlib.sha256).hexdigest())
 body["signature"] = sign
 
 res: requests.models.Response = None
