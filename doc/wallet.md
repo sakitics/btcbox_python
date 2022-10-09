@@ -1,11 +1,11 @@
-### Trade view（注文の詳細情報を取得）
+### Wallet（アドレスの取得）
 
-指定された注文の詳細情報を取得できます。
+指定された暗号資産のBTCBOXアカウント内の入金アドレスを取得できます。
 
 #### Request
 
 ```http request
-GET /api/v1/trade_view
+GET /api/v1/wallet
 ```
 
 #### Request parameters
@@ -13,7 +13,6 @@ GET /api/v1/trade_view
 | Name      | Type | Required | Description                                       |
 |-----------|------|----------|---------------------------------------------------|
 | coin      | str  | no       | 取扱銘柄：btc、bch、ltc、eth、doge、dot、trxのいずれか（デフォルトはbtc） |
-| id        | str  | yes      | 注文ID                                              |
 | key       | str  | yes      | APIキー（公開鍵）                                        |
 | nonce     | str  | yes      | ノンス                                               |
 | signature | str  | yes      | 署名                                                |
@@ -39,7 +38,7 @@ apikey_secret: str = config.get("DEEP", "sec")
 symbol: str = config.get("DEEP", "coin")
 
 endpoint: str = "https://www.btcbox.co.jp/api/v1"
-path: str = "/trade_view"
+path: str = "/wallet"
 url: str = "".join([
     endpoint,
     path,
@@ -50,7 +49,6 @@ status_code: int = 200
 timestamp: float = datetime.datetime.now().timestamp() * 1000
 body: dict = {
     "coin": symbol,
-    "id": "11",
     "key": apikey_public,
     "nonce": timestamp,
 }
@@ -86,28 +84,17 @@ print((data, status_code))
 
 #### Response
 
-| Name               | Type  | Description                                                     |
-|--------------------|-------|-----------------------------------------------------------------|
-| id                 | str   | 注文ID                                                            |
-| datetime           | str   | 注文日時（yyyy-mm-dd hh:mm:ss形式）                                     |
-| type               | str   | 売買区分（sellまたはbuy）                                                |
-| price              | int   | 注文価格                                                            |
-| amount_original    | float | 注文数量                                                            |
-| amount_outstanding | float | 未約定数量                                                           |
-| status             | str   | 注文状態（wait: 未約定, part: 未約定または一部約定, cancelled: 取消済み, all: 全て約定済み） |
+| Name    | Type | Description               |
+|---------|------|---------------------------|
+| result  | bool | 処理結果（true: 成功, false: 失敗） |
+| address | str  | 入金アドレス                    |
 
 #### Response example
 
 ```json
 {
-    "id": 11,
-    "datetime": "2014-10-21 10:47:20",
-    "type": "sell",
-    "price": 42000,
-    "amount_original": 1.2,
-    "amount_outstanding": 0,
-    "status": "all",
-    "trades": []
+    "result": true,
+    "address": "xxxxxxxxxxxxxxxxxxxxxxxxx"
 }
 ```
 

@@ -100,47 +100,47 @@ print((data, status_code))
 #### Response example
 
 ```json
-[  
-   {  
-      "id": "7",
-      "datetime": "2014-10-20 13:27:38",
-      "type": "buy",
-      "price": 42750,
-      "amount_original": 0.235,
-      "amount_outstanding": 0.235
-   },
-   {  
-      "id": "6",
-      "datetime": "2014-10-20 13:27:15",
-      "type": "buy",
-      "price": 43299,
-      "amount_original": 4.789,
-      "amount_outstanding": 4.789
-   },
-   {  
-      "id": "5",
-      "datetime": "2014-10-20 13:26:52",
-      "type": "buy",
-      "price": 42500,
-      "amount_original": 14,
-      "amount_outstanding": 14
-   },
-   {  
-      "id": "4",
-      "datetime": "2014-10-20 13:26:23",
-      "type": "buy",
-      "price": 43200,
-      "amount_original": 0.4813,
-      "amount_outstanding": 0.4813
-   },
-   {  
-      "id": "3",
-      "datetime": "2014-10-20 13:25:57",
-      "type": "buy",
-      "price": 43200,
-      "amount_original": 0.4813,
-      "amount_outstanding": 0.4813
-   }
+[
+    {
+        "id": "7",
+        "datetime": "2014-10-20 13:27:38",
+        "type": "buy",
+        "price": 42750,
+        "amount_original": 0.235,
+        "amount_outstanding": 0.235
+    },
+    {
+        "id": "6",
+        "datetime": "2014-10-20 13:27:15",
+        "type": "buy",
+        "price": 43299,
+        "amount_original": 4.789,
+        "amount_outstanding": 4.789
+    },
+    {
+        "id": "5",
+        "datetime": "2014-10-20 13:26:52",
+        "type": "buy",
+        "price": 42500,
+        "amount_original": 14,
+        "amount_outstanding": 14
+    },
+    {
+        "id": "4",
+        "datetime": "2014-10-20 13:26:23",
+        "type": "buy",
+        "price": 43200,
+        "amount_original": 0.4813,
+        "amount_outstanding": 0.4813
+    },
+    {
+        "id": "3",
+        "datetime": "2014-10-20 13:25:57",
+        "type": "buy",
+        "price": 43200,
+        "amount_original": 0.4813,
+        "amount_outstanding": 0.4813
+    }
 ]
 ```
 
